@@ -65,4 +65,42 @@
   - To use any of the state data, just use `{this.state.propertyName}`.
 - HTML in an react app is called JSX, its just an extension of HTML that can be written in js files within a react app.
 - All JSX elements supports the event handlers similar to that of HTML elements. Like `onClick, onChange... etc`.
-- React only re-renders the Component if it finds any change in the object reference. It doesn't re-render if the object's data is just re-assigned (i.e., the reference of the object remains unchanged). To accomplish this, react provides a built method `this.setState({property: 'newValue'})`. This makes sure to update the state with new object reference, which then forces the react to re-render the component with the updated values.
+- React only re-renders the Component if it finds any change in the object reference. It doesn't re-render if the object's data is just re-assigned (i.e., the reference of the object remains unchanged). To accomplish this, react provides a built method `this.setState({property: 'newValue'});`. This makes sure to update the state with new object reference, which then forces the react to re-render the component with the updated values. setState() method does shallow merging of the object.
+- While shallow merging, always make sure the data type is the same as the previous one.
+- `setState()` is an asynchronous method. Remember that the sequential execution doesn't happen.
+- Along with `setState()` taking the object as an argument, it can also take 2 callback functions as arguments.
+  1. The first callback function gives 2 parameters `state` (current state of the component) and `props`. This callback function returns the new object.
+  2. The second callback function is **optional**. It executes only after the completion of the first call function and the state got updated successfully.
+  - ```javascript
+    this.setState(
+      (state, props) => {
+        // state - current state object of the component (optional argument)
+        // props - **Yet to be discussed (optional argument) UPDATE IT**
+        return {
+          property1: "value1",
+          property2: "value2",
+        };
+      },
+      () => {
+        // This callback function executes only after the state is successfully updated (optional)
+        console.log(this.state);
+      }
+    );
+    ```
+- It is important to mention the `key` attribute on react JSX element so that react can uniquely identify the specific element and re-render it. The key's value should be unique from the rest of the similar elements.
+
+## Single Page Applications (SPA)
+
+- Previously for each route there used to be different html, css, js files which has to be rendered by the browser each time user requests for it. As it has to fetch all the relevant files, render and then display on the UI, it takes some time and is not so efficient.
+- So to overcome that problem we have SPAs. React apps are SPAs. Here on the initial request the files (which also includes react framework) will be fetched but when a new route is needed the same page will be re-rendered with new components (React takes care of this process of removing, updating and adding components to the page). This way it is efficient to load the pages while making very few calls to the server.
+- Always use `curly braces {}` to include javascript code.
+
+## React Lifecycle methods
+
+- `ComponentDidMount()`: This method gets invoked when the component is placed on the DOM.
+- MORE TO BE ADDED HERE
+
+## Optimizations
+
+- If the function remains same, prefer defining it rather than using it as anonymous callback functions. It doesn't show any effect with an app having one or two such anonymous callback functions but it does impact when the number grows.
+- Leverage js advanced concepts to make code look clean and efficient. Like using de-structuring, array methods like map, filter... etc
