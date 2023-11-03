@@ -65,7 +65,7 @@
   - To use any of the state data, just use `{this.state.propertyName}`.
 - HTML in an react app is called JSX, its just an extension of HTML that can be written in js files within a react app.
 - All JSX elements supports the event handlers similar to that of HTML elements. Like `onClick, onChange... etc`.
-- React only re-renders the Component if it finds any change in the object reference. It doesn't re-render if the object's data is just re-assigned (i.e., the reference of the object remains unchanged). To accomplish this, react provides a built method `this.setState({property: 'newValue'});`. This makes sure to update the state with new object reference, which then forces the react to re-render the component with the updated values. setState() method does shallow merging of the object.
+- React only re-renders the Component if it finds any change in the object reference. It doesn't re-render if the object's data is just re-assigned (i.e., the reference of the object remains unchanged). To accomplish this, react provides a built-in method `this.setState({property: 'newValue'});`. This makes sure to update the state with new object reference, which then forces the react to re-render the component with the updated values. setState() method does shallow merging of the object.
 - While shallow merging, always make sure the data type is the same as the previous one.
 - `setState()` is an asynchronous method. Remember that the sequential execution doesn't happen.
 - Along with `setState()` taking the object as an argument, it can also take 2 callback functions as arguments.
@@ -75,7 +75,7 @@
     this.setState(
       (state, props) => {
         // state - current state object of the component (optional argument)
-        // props - **Yet to be discussed (optional argument) UPDATE IT**
+        // props - a property/attribute that is associated with a custom component. Like `className`, `type` on pre-defined React components. At the component level the props can be accessed with `this.props` which returns an object.
         return {
           property1: "value1",
           property2: "value2",
@@ -104,3 +104,12 @@
 
 - If the function remains same, prefer defining it rather than using it as anonymous callback functions. It doesn't show any effect with an app having one or two such anonymous callback functions but it does impact when the number grows.
 - Leverage js advanced concepts to make code look clean and efficient. Like using de-structuring, array methods like map, filter... etc
+
+## Components
+
+- Components can be seen as an element that can be reused to serve a different purpose. e.g: a search bar can be a component which can be reused more than one time in an application, a card component once created can be reused at an another part of the application to serve a different purpose.
+- While developing components it is better to see if it can be generalized and reused.
+- Always return only one top level html on custom components (no siblings at the top level)
+- Never include logic in the component. Component should just have the data to be rendered and returned.
+- Just like the `setState()` re-renders a component, any change in the `this.props` values will trigger render method. So to update the UI, its important to update either from `setState()` method or the `props`.
+- Except for the standard attributes like `type='search', type='input'...`, pass the values as props to the component.
