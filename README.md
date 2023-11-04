@@ -97,8 +97,11 @@
 
 ## React Lifecycle methods
 
-- `ComponentDidMount()`: This method gets invoked when the component is placed on the DOM.
-- MORE TO BE ADDED HERE
+- `componentDidMount()`: This method gets invoked when the component is placed on the DOM.
+- `componentDidUpdate()`: This method gets invoked when there is an update through `this.props`, `setState()`, `forceUpdate()`
+- `componentWillUnmount()`: This method gets invoked where the component gets removed from the page. Through which the existing eventListeners can be removed to avoid any memory leaks.
+
+> _For more information on React's class based Lifecycle methods, refer this [page](https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)_
 
 ## Optimizations
 
@@ -113,3 +116,4 @@
 - Never include logic in the component. Component should just have the data to be rendered and returned.
 - Just like the `setState()` re-renders a component, any change in the `this.props` values will trigger render method. So to update the UI, its important to update either from `setState()` method or the `props`.
 - Except for the standard attributes like `type='search', type='input'...`, pass the values as props to the component.
+- CSS in React is global even when the css file is located in a different component folder. When loading CSS, React appends all styles into a single file. So, the classNames shouldn't be overlapped. (To make the CSS style restricted to a component, css in js library can be used)
