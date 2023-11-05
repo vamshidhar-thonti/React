@@ -1,4 +1,4 @@
-# REACT NOTES
+<center><h1>React Notes</h1></center>
 
 ---
 
@@ -117,3 +117,68 @@
 - Just like the `setState()` re-renders a component, any change in the `this.props` values will trigger render method. So to update the UI, its important to update either from `setState()` method or the `props`.
 - Except for the standard attributes like `type='search', type='input'...`, pass the values as props to the component.
 - CSS in React is global even when the css file is located in a different component folder. When loading CSS, React appends all styles into a single file. So, the classNames shouldn't be overlapped. (To make the CSS style restricted to a component, css in js library can be used)
+
+## Functional Components
+
+- React Functional components are just arrow functions `const App = () => {}` that doesn't have any life cycle methods, constructor or render methods like Class based components. Whatever HTML-JSX returned by the Functional component will be rendered on the UI.
+  - ```javascript
+    const App = () => {
+      return (
+        <div className="App">
+          <h1 className="app-title">Monsters Rolodex</h1>
+        </div>
+      );
+    };
+    ```
+- **Pure Functions:** Functions that doesn't modify or rely on the external variables and in-turn doesn't produce any side effects (_when an external value is being modified by a function_) are Pure Functions. The output from these functions solely depends on the parameters passed to the function and the output remains same given the same parameters are passed.
+
+  - ```javascript
+    // Isolated from external variables
+    const pureFunction = (a, b) => {
+      return a + b;
+    };
+
+    pureFunction(2, 4); // Always returns 6
+    ```
+
+- **Impure Functions:** Functions that modify or rely on the external variables which causes the output of the function to change whenever the external variable changes. Also if a function changes a variable's value, its considered to be an Impure Function.
+
+  - ```javascript
+    let c = 3;
+
+    // Function returns a new value when c value changes
+    const impureFunction1 = (a, b) => {
+      return a + b + c;
+    };
+
+    impureFunction1(2, 4); // returns 9; if c = 4, returns 10
+
+    // Function modifies the external variable c which causes the side effect
+    const impureFunction2 = (a, b) => {
+      c = a + b;
+
+      return a * b;
+    };
+
+    impureFunction2(2, 4); // always returns 8 but c gets modified to 6 which is a side effect
+    ```
+
+- Functional components runs the entire function to render or re-render a component.
+- re-rendering happens only when there is a change in the state value from the previous value or when the props (parameters passed to the functional component) changes. If the state value is same as previous react doesn't run the functional component.
+- **Infinite re-rendering** causes when an external API call is made within the functional component. It happens because, the API result will be stored in a different memory location than the previous one, so even though the received objects are equal the strict equality (which is what react do to identify the change) will not be true with different object references. So avoid using `fetch()` within functional components. To resolve this react provides another hook called `useEffect()` which causes the side effect outside the functional component's scope.
+
+- ### Hooks:
+
+  - `useState()` method is used in Functional based components, the parameter passed to this method will be the default value. It can store only one value, for a different value another hook has to be used. It returns 2 values, the value and a method to set a new value.
+  - `useEffect()` method is used to create side effects. It only triggers when the **mentioned** props or state values modified. It takes 2 arguments: _callback method_ and a _list of values_. The callback function is called only when the values mentioned in the list (2nd argument) gets modified. If the list is empty the callback function executes only once during the app initial run.
+
+- Functional components give only 2 arguments:
+  1. `props`: props from the HTML-JSX elements
+  2. `forwardRef`: **Yet to be discussed** Will not be used as often as props.
+
+## Real DOM vs Virtual DOMS:
+
+- Real DOM is tree of nodes presented as a parent child relationship. Its expensive when the real DOM needs to be updated/re-flow.
+- Virtual DOM is javascript representation of Real DOM, its just a copy of Real DOM.
+- This is what happens when there is a change detected by React:
+  - React maintains 2 copies of Virtual DOMs: _Virtual DOM snapshot_ which is the original copy of React DOM before changes are applied and _Virtual DOM copy_ which is the copied version of Virtual DOM snapshot. The detected changes will applied to Virtual DOM copy by doing some diffs and batching to determine new Virtual DOM once that is done it then updates the Real DOM as efficient as possible.
