@@ -182,3 +182,35 @@
 - Virtual DOM is javascript representation of Real DOM, its just a copy of Real DOM.
 - This is what happens when there is a change detected by React:
   - React maintains 2 copies of Virtual DOMs: _Virtual DOM snapshot_ which is the original copy of React DOM before changes are applied and _Virtual DOM copy_ which is the copied version of Virtual DOM snapshot. The detected changes will applied to Virtual DOM copy by doing some diffs and batching to determine new Virtual DOM once that is done it then updates the Real DOM as efficient as possible.
+
+## Router (Routing in React):
+
+- Navigating to a new page when the URL path is modified.
+- For organizing the routes better, a `routes` directory can be used under `src` directory, which holds all the Route related files.
+- `BrowserRouter` is basic router which gives the ability of storing the current location of the URL using browser's in-built history stack. The main `App` component in `index.js` has to be inside the **BrowserRouter**.
+  - ```javascript
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+    ```
+- `Routes` is component that defines the routes of the application. All individual routes should be withing the Routes component.
+  - ```javascript
+    <Routes>
+      <Route path="/" element={<Home />} />
+    </Routes>
+    ```
+- `Route` is component that specifically used to be define a URL route. `path` attribute is to specify the relative URL and `element` attribute is to specify the entire component.
+  - ```javascript
+    <Route path="/" element={<Home />} />
+    ```
+- `Outlet` component is helpful in Routes when there is an expected dynamic component that keeps changing. For example, navigation bar remains on the page for all the routes, so for the navigation component we define the `Outlet` component. Any child route in the Routes will be replaced with the `Outlet` component based on the route path. Routes can nested as deeply as possible.
+  - `index` attribute is to tell that route should be on the corresponding parent route.
+  - `path` attribute defines the subroute on the parent route, if parent route is `/shop`, and the child route has the path attribute `men`, then entire path for sub route would be `/shop/men`
+  - `element` attribute defines the Component which we want to associate the path with.
+- `Fragment` is an empty component from react. Instead of wrapping around the code with div when there is a possibility of sibling elements, we can use a Fragment component, it doesn't introduce any div element and still we can have sibiling elements within a Fragment.
+- `Link` is a component provided by react-router-dom, which can be used to create an anchor tag with an extra ability to specify the route with `to` attribute.
+  - ```javascript
+    <Link className="nav-link" to="/link1">
+      <div>Link1</div>
+    </Link>
+    ```
