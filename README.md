@@ -214,3 +214,62 @@
       <div>Link1</div>
     </Link>
     ```
+
+- While using `form` be sure make the data circularly dependent with the help of `useState()`. As per the example below a ny change in the input field triggers the `setFormFields` method which re-assigns all the values, those values will be set as the value in the corresponding input fields.
+  - ```javascript
+      const SignUpForm = () => {
+        const [formFields, setFormFields] = useState(defaultFormFields);
+        const { displayName, email, password, confirmPassword } = formFields;
+
+        const handleChange = (event) => {
+          const { name, value } = event.target;
+
+          setFormFields({ ...formFields, [name]: value });
+        };
+
+        return (
+          <div>
+            <h1>Sign Up with your Email and Password</h1>
+            <form onSubmit={() => {}}>
+              <label>Display Name</label>
+              <input
+                type="text"
+                onChange={handleChange}
+                name="displayName"
+                value={displayName}
+                required
+              />
+
+              <label>Email</label>
+              <input
+                type="email"
+                onChange={handleChange}
+                name="email"
+                value={email}
+                required
+              />
+
+              <label>Password</label>
+              <input
+                type="password"
+                onChange={handleChange}
+                name="password"
+                value={password}
+                required
+              />
+
+              <label>Confirm Password</label>
+              <input
+                type="password"
+                onChange={handleChange}
+                name="confirmPassword"
+                value={confirmPassword}
+                required
+              />
+
+              <button type="submit">Sign Up</button>
+            </form>
+          </div>
+        );
+      };
+    ```
