@@ -209,6 +209,7 @@
   - `element` attribute defines the Component which we want to associate the path with.
 - `Fragment` is an empty component from react. Instead of wrapping around the code with div when there is a possibility of sibling elements, we can use a Fragment component, it doesn't introduce any div element and still we can have sibiling elements within a Fragment.
 - `Link` is a component provided by react-router-dom, which can be used to create an anchor tag with an extra ability to specify the route with `to` attribute.
+
   - ```javascript
     <Link className="nav-link" to="/link1">
       <div>Link1</div>
@@ -216,60 +217,129 @@
     ```
 
 - While using `form` be sure make the data circularly dependent with the help of `useState()`. As per the example below a ny change in the input field triggers the `setFormFields` method which re-assigns all the values, those values will be set as the value in the corresponding input fields.
+
   - ```javascript
-      const SignUpForm = () => {
-        const [formFields, setFormFields] = useState(defaultFormFields);
-        const { displayName, email, password, confirmPassword } = formFields;
+    const SignUpForm = () => {
+      const [formFields, setFormFields] = useState(defaultFormFields);
+      const { displayName, email, password, confirmPassword } = formFields;
 
-        const handleChange = (event) => {
-          const { name, value } = event.target;
+      const handleChange = (event) => {
+        const { name, value } = event.target;
 
-          setFormFields({ ...formFields, [name]: value });
-        };
-
-        return (
-          <div>
-            <h1>Sign Up with your Email and Password</h1>
-            <form onSubmit={() => {}}>
-              <label>Display Name</label>
-              <input
-                type="text"
-                onChange={handleChange}
-                name="displayName"
-                value={displayName}
-                required
-              />
-
-              <label>Email</label>
-              <input
-                type="email"
-                onChange={handleChange}
-                name="email"
-                value={email}
-                required
-              />
-
-              <label>Password</label>
-              <input
-                type="password"
-                onChange={handleChange}
-                name="password"
-                value={password}
-                required
-              />
-
-              <label>Confirm Password</label>
-              <input
-                type="password"
-                onChange={handleChange}
-                name="confirmPassword"
-                value={confirmPassword}
-                required
-              />
-
-              <button type="submit">Sign Up</button>
-            </form>
-          </div>
-        );
+        setFormFields({ ...formFields, [name]: value });
       };
+
+      return (
+        <div>
+          <h1>Sign Up with your Email and Password</h1>
+          <form onSubmit={() => {}}>
+            <label>Display Name</label>
+            <input
+              type="text"
+              onChange={handleChange}
+              name="displayName"
+              value={displayName}
+              required
+            />
+
+            <label>Email</label>
+            <input
+              type="email"
+              onChange={handleChange}
+              name="email"
+              value={email}
+              required
+            />
+
+            <label>Password</label>
+            <input
+              type="password"
+              onChange={handleChange}
+              name="password"
+              value={password}
+              required
+            />
+
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              onChange={handleChange}
+              name="confirmPassword"
+              value={confirmPassword}
+              required
+            />
+
+            <button type="submit">Sign Up</button>
+          </form>
+        </div>
+      );
+    };
     ```
+
+## Context in React:
+
+- In order to pass data from one component to another component, one way acheiving it is to pass it to the parent component till it reaches the required component which is called `Drilling`. But doing so, the data is being available to the components which doesn't need it. To avoid that we need something called `Context`.
+- `Context` is also a component that wraps around the component where the data can be accessed.
+- `useContext` hook can be used to access the data updated in the context by a different component. For example, after successful sign in, firebase gives a user object which holds all the information of the logged in user. To use the same data in the different component like navigation to display SignOut option, we can use this hook to update the user object in the object and then the same hook can be used to access the data in different component without being drilled through parent components.
+
+  - The following code snippet shows, how to create a context
+
+    ```javascript
+    import { createContext } from "react";
+
+    // Initialize a context using CreateContext method with default null initial values. Where currentUser holds the actual information and setCurrentUser is the setter function which helps in assigning the user object to the currentUser variable.
+    export const UserContext = createContext({
+      currentUser: null,
+      setCurrentUser: () => null,
+    });
+
+    // Each context should have provider, which takes children that needs to be wrapped around the context's provider. useState hook can be used to initialize the variable with a setter function. Whenever the User Provider in used in the index.js as a wrapper it return the UserContext.Provider component with its children wrapped around along with the initalised curerntUser object and its setter function.
+    export const UserProvider = ({ children }) => {
+      const [currentUser, setCurrentUser] = useState(null);
+      const value = { currentUser, setCurrentUser };
+
+      return (
+        <UserContext.Provider value={value}>{children}</UserContext.Provider>
+      );
+    };
+    ```
+
+  - To use the context in any of the components, the Context's Provider has to be wrapped around the App component.
+
+  ```javascript
+  const root = ReactDOM.createRoot(document.getElementById("root"));
+  root.render(
+    <React.StrictMode>
+      <BrowserRouter>
+        <UserProvider>
+          <App />
+        </UserProvider>
+      </BrowserRouter>
+    </React.StrictMode>
+  );
+  ```
+
+  - To set the value to the context, below is the code
+
+    ```javascript
+    import { useContext } from "react";
+    import { UserContext } from "../../contexts/user.context";
+
+    // Here the setter function is being fetched from context.
+    const { setUserContext } = useContext(UserContext);
+
+    // Using the setter function, the actual object has been assigned through it.
+    setUserContext(userObject);
+    ```
+
+  - To fetch the value from the context, below is the code
+
+    ```javascript
+    import { useContext } from "react";
+    import { UserContext } from "../../contexts/user.context";
+
+    // Here the currentUser value itself is being called.
+    const { currentUser } = useContext(UserContext);
+    ```
+
+  - `onAuthStateChanged` method in react is used to track the authentication changes happening on the singleton auth object (returned from getAuth() method). It takes 2 arguments, auth object and the callback function. So, as soon as the auth change happens the callback function gets triggered.
