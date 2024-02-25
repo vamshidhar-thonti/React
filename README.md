@@ -171,6 +171,18 @@
 
   - `useState()` method is used in Functional based components, the parameter passed to this method will be the default value. It can store only one value, for a different value another hook has to be used. It returns 2 values, the value and a method to set a new value.
   - `useEffect()` method is used to create side effects. It only triggers when the **mentioned** props or state values modified. It takes 2 arguments: _callback method_ and a _list of values_. The callback function is called only when the values mentioned in the list (2nd argument) gets modified. If the list is empty the callback function executes only once during the app initial run.
+  - `useNavigate()` hook is programtic way of implementing React's `Link` component. Use it as a handler and pass the desired route as the parameter and pass it to the Event Handlers.
+
+    ```javascript
+    import { useNavigate } from "react-router-dom";
+
+    const navigate = useNavigate();
+    const onNavigateHandler = () => navigate("shop/hats");
+
+    <DirectoryItemContainer onClick={onNavigateHandler}>
+      {REST_OF_THE_JS_CODE}
+    </DirectoryItemContainer>;
+    ```
 
 - Functional components give only 2 arguments:
   1. `props`: props from the HTML-JSX elements
@@ -343,3 +355,51 @@
     ```
 
   - `onAuthStateChanged` method in react is used to track the authentication changes happening on the singleton auth object (returned from getAuth() method). It takes 2 arguments, auth object and the callback function. So, as soon as the auth change happens the callback function gets triggered.
+
+  - Never add 2 different logics in the same `useEffect()` hook even though the dependency array is same for both the logics. For example, if we want to perform 2 different logics when the value of `cartItems` gets updated, have those 2 logics in a 2 different useEffect hooks.
+
+## Patterns in React:
+
+- In order to use async functions in useEffect hook, instead making the function within the hook as async, we can create a new async function inside the function and then call it.
+- ```javascript
+  useEffect(() => {
+    const getCategoriesMap = async () => {
+      const categoryMap = await getCategoriesAndDocuments();
+      console.log(categoryMap);
+    };
+
+    getCategoriesMap();
+  }, []);
+  ```
+
+## CSS in JS
+
+- To use CSS in JS we create a file with jsx or js extension and the `styled-components` library will be used which have all the relevant html elements.
+- We just create a React component with desired styles, export and use it at the desired element.
+- In CSS, we write the styles as
+
+  ```css
+  .navigation-container {
+    height: 70px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+  }
+  ```
+
+- The equivalent style of the above CSS in `CSS in JS` is
+  ```javascript
+  export const NavigationContainer = styled.div`
+    height: 70px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+  `;
+  ```
+- If any pre-built React components has to be used (say `Link` React component) we use
+
+  ```javascript
+  styled(Link)`Styles Code Goes Here`;
+  ```
