@@ -403,3 +403,72 @@
   ```javascript
   styled(Link)`Styles Code Goes Here`;
   ```
+
+## Reducers
+
+- Reducers are the alternative way of implementing the contexts in React. The main advantage of using Reducers is that the implementation is scalable and effective. Whereas using the `useState()` hook in comparatively less scalable because the logic to update the variables has to be taken individually. For example, while updating the cart, it involves in updating the `cartItems`, `cartCount`, `cartTotal` variables which has to be updated individually when `useState()` hook is used. The same can be done in a more effective way by using `useReducer()` way of implementing it.
+- Though most of the code seems similar with `useState()` and `useReducer()`, the latter is more effecient.
+- The `useReducer()` hook takes 2 arguments and returns 2 variables
+  ```javascript
+  const [state, dispatch] = useReducer(cartReducer, INITIAL_STATE);
+  ```
+  2 Arguments are:
+
+  - `Reducer function`: The logical implementation of what has to be done when a specific type is passed.
+
+    ```javascript
+    const cartReducer = (state, action) => {
+      const { type, payload } = action;
+
+      switch (type) {
+        case CART_ACTION_TYPES.SET_CART_ITEMS:
+          return {
+            ...state,
+            ...payload,
+          };
+
+        case CART_ACTION_TYPES.SET_IS_CART_OPEN:
+          return {
+            ...state,
+            ...payload,
+          };
+
+        default:
+          throw new Error(`Unhandled type ${type} in cartReducer`);
+      }
+    };
+    ```
+
+  - `INITIAL_STATE`: The deafult values of all the context variables
+    ```javascript
+    const INITIAL_STATE = {
+      isCartOpen: false,
+      cartItems: [],
+      cartCount: 0,
+      cartTotal: 0,
+    };
+    ```
+
+  2 return variables are
+
+  - `state`: The state variable will be returned which holds the values that we have passed as the initial value as an argument to the useReducer() hook.
+    ```javascript
+    const { cartItems, isCartOpen, cartCount, cartTotal } = state;
+    ```
+  - `dispatch`: The dispatch function when called, hits the reducer function that has been passed as an argument to the useReducer() hook. It takes an object as an argument, which should contain a `type` -> the action that has to be done and the `payload` -> the updated data that needs to be passed further
+
+    ```javascript
+    dispatch({
+      type: CART_ACTION_TYPES.SET_CART_ITEMS,
+      payload: {  
+        cartItems: newCartItems,
+        cartCount: newCartCount,
+        cartTotal: newCartTotal,
+      },
+    });
+    ```
+
+## Deploying the site to netlify
+
+- Use `CI= yran build` command to enable CI feature with github and netlify
+- Redirects on a specific route doesn't happen on refresh in netlify, to fix it, create a new file with name `_redirects` and add the following code `/* /index.html 200`, which means that whenever a refresh request hits the server with a route in the URL, netlify automatically routes it index.html and further renders the given route's page.
