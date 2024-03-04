@@ -409,9 +409,11 @@
 - Reducers are the alternative way of implementing the contexts in React. The main advantage of using Reducers is that the implementation is scalable and effective. Whereas using the `useState()` hook in comparatively less scalable because the logic to update the variables has to be taken individually. For example, while updating the cart, it involves in updating the `cartItems`, `cartCount`, `cartTotal` variables which has to be updated individually when `useState()` hook is used. The same can be done in a more effective way by using `useReducer()` way of implementing it.
 - Though most of the code seems similar with `useState()` and `useReducer()`, the latter is more effecient.
 - The `useReducer()` hook takes 2 arguments and returns 2 variables
+
   ```javascript
   const [state, dispatch] = useReducer(cartReducer, INITIAL_STATE);
   ```
+
   2 Arguments are:
 
   - `Reducer function`: The logical implementation of what has to be done when a specific type is passed.
@@ -460,7 +462,7 @@
     ```javascript
     dispatch({
       type: CART_ACTION_TYPES.SET_CART_ITEMS,
-      payload: {  
+      payload: {
         cartItems: newCartItems,
         cartCount: newCartCount,
         cartTotal: newCartTotal,
@@ -471,4 +473,4 @@
 ## Deploying the site to netlify
 
 - Use `CI= yran build` command to enable CI feature with github and netlify
-- Redirects on a specific route doesn't happen on refresh in netlify, to fix it, create a new file with name `_redirects` and add the following code `/* /index.html 200`, which means that whenever a refresh request hits the server with a route in the URL, netlify automatically routes it index.html and further renders the given route's page.
+- Redirects on a specific route doesn't happen on refresh in netlify, to fix it, create a new file with name `_redirects` in the `public` folder and add the following code `/* /index.html 200`, which means that whenever a refresh request hits the server with a route in the URL, netlify automatically routes it index.html and further renders the given route's page.

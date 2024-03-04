@@ -1,6 +1,10 @@
-import { useContext } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import { CartContext } from "../../contexts/cart.context";
+import { selectCartItems } from "../../store/cart/cart.selector.js";
+import {
+  addItemToCart,
+  removeItemFromCart,
+} from "../../store/cart/cart.action.js";
 
 import "./checkout-item.styles.jsx";
 
@@ -16,9 +20,10 @@ import {
 } from "./checkout-item.styles.jsx";
 
 const CheckoutItem = ({ cartItem }) => {
+  const dispatch = useDispatch();
   const { imageUrl, name, quantity, price } = cartItem;
 
-  const { addItemToCart, removeItemFromCart } = useContext(CartContext);
+  const cartItems = useSelector(selectCartItems);
 
   return (
     <CheckoutItemContainer>
@@ -27,12 +32,20 @@ const CheckoutItem = ({ cartItem }) => {
       </ImageContainer>
       <Name>{name}</Name>
       <Quantity>
-        <Arrow onClick={() => addItemToCart(cartItem, true)}>&#10094;</Arrow>
+        <Arrow
+          onClick={() => dispatch(addItemToCart(cartItems, cartItem, true))}
+        >
+          &#10094;
+        </Arrow>
         <Value>{quantity}</Value>
-        <Arrow onClick={() => addItemToCart(cartItem)}>&#10095;</Arrow>
+        <Arrow onClick={() => dispatch(addItemToCart(cartItems, cartItem))}>
+          &#10095;
+        </Arrow>
       </Quantity>
       <Price>{price}</Price>
-      <RemoveButton onClick={() => removeItemFromCart(cartItem)}>
+      <RemoveButton
+        onClick={() => dispatch(removeItemFromCart(cartItems, cartItem))}
+      >
         &#10005;
       </RemoveButton>
     </CheckoutItemContainer>
