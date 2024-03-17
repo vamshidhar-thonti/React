@@ -480,7 +480,20 @@
 - The whole idea of using `react-redux` is to have one `root-reducer` which links with all the individual reducers that returns all the required data as a `state`. When an `action` is fired from the UI component, the corresponding `action-type` will dispatched and `state` will be updated (The action dispatched once will be sent to all the reducers even though its irrelevant to a specific reducer and only the relevant reducer matching the action-type will be triggered). Added adavantage of using redux is additional middlewares can be added which helps in monitoring the flow/state or add the persist functionality. With `redux-react` package, it gives 2 functions `useDispatch` and `useSelector`
 
   - Previously `useReducer()` returned the `dispatch` method for each component but here, the `useDispatch()` will give the `dispatch` method. Once these are called with the corresponding action functions, the action will be sent to all the reducers and respective reducer matching the action type will be executed.
+
+    ```javascript
+    import { useDispatch } from "react-redux";
+    const dispatch = useDispatch();
+    ```
+
   - `useSelector()` helps in connecting the corresponding `selector` method which returns the desired `data` from the `state`.
+
+    ```javascript
+    import { useSelector } from "react-redux";
+    import { selectCategoriesMap } from "../../store/categories/category.selector";
+
+    const categoriesMap = useSelector(selectCategoriesMap);
+    ```
 
   ### Following are the files required to create a react-redux based state
 
