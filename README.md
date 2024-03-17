@@ -470,6 +470,192 @@
     });
     ```
 
+- To retreive the values that has been dispatched by the componenets, we can use the same `useContext()` hook which gives the desired values back to us.
+  ```javascript
+  const { currentUser } = useContext(UserContext);
+  ```
+
+## Redux
+
+- The whole idea of using `react-redux` is to have one `root-reducer` which links with all the individual reducers that returns all the required data as a `state`. When an `action` is fired from the UI component, the corresponding `action-type` will dispatched and `state` will be updated (The action dispatched once will be sent to all the reducers even though its irrelevant to a specific reducer and only the relevant reducer matching the action-type will be triggered). Added adavantage of using redux is additional middlewares can be added which helps in monitoring the flow/state or add the persist functionality. With `redux-react` package, it gives 2 functions `useDispatch` and `useSelector`
+
+  - Previously `useReducer()` returned the `dispatch` method for each component but here, the `useDispatch()` will give the `dispatch` method. Once these are called with the corresponding action functions, the action will be sent to all the reducers and respective reducer matching the action type will be executed.
+  - `useSelector()` helps in connecting the corresponding `selector` method which returns the desired `data` from the `state`.
+
+  ### Following are the files required to create a react-redux based state
+
+  - `category.action.js`
+
+    ```javascript
+    import { CATEGORIES_ACTION_TYPES } from "./category.types";
+
+    import { createAction } from "../../utils/reducer/reducer.utils";
+
+    export const setCategories = (categoriesArray) =>
+      createAction(CATEGORIES_ACTION_TYPES.SET_CATEGORIES, categoriesArray);
+    ```
+
+  - `category.reducer.js`
+
+    ```javascript
+    import { CATEGORIES_ACTION_TYPES } from "./category.types";
+
+    export const CATEGORIES_INITIAL_STATE = {
+      categories: [],
+    };
+
+    export const categoriesReducer = (
+      state = CATEGORIES_INITIAL_STATE,
+      action = {}
+    ) => {
+      const { type, payload } = action;
+
+      switch (type) {
+        case CATEGORIES_ACTION_TYPES.SET_CATEGORIES:
+          return { ...state, categories: payload };
+        default:
+          return state;
+      }
+    };
+    ```
+
+  - `category.selector.js`
+
+    ```javascript
+    import { createSelector } from "reselect";
+
+    const selectCategoryReducer = (state) => state.categories;
+
+    export const selectCategories = createSelector(
+      [selectCategoryReducer],
+      (categoriesSlice) => categoriesSlice.categories
+    );
+
+    export const selectCategoriesMap = createSelector(
+      [selectCategories],
+      (categories) =>
+        categories.reduce((acc, category) => {
+          const { title, items } = category;
+          acc[title.toLowerCase()] = items;
+          return acc;
+        }, {})
+    );
+    ```
+
+  - `category.types.js`
+
+    ```javascript
+    export const CATEGORIES_ACTION_TYPES = {
+      SET_CATEGORIES: "category/SET_CATEGORIES",
+    };
+    ```
+
+## reselect
+
+- One disadvantage with `redux` is, once the `dispatch` gets called, the `useSelector()` gets triggered and the components using the state forced to re-render which is unnecessary when a component's state data is unchanged. To avoid this scenario `reselect` package can be used. The main logic with it is `memoization` which caches the data and updates the data only if the reference is changed. This way the unnecessary re-render of the component can be avoided and improve the efficiency. Refer the code from above.
+
+## redux-persist
+
+- To persist the data from previous session we can leverage `redux-persist` package which manages and stores the data in local storage and retreives on load. The configuration of this packages goes in the middleware/store.js
+
+  - In `store.js`
+
+    ```javascript
+    import { compose, createStore, applyMiddleware } from "redux";
+    import { persistStore, persistReducer } from "redux-persist";
+    import storage from "redux-persist/lib/storage";
+
+    // import { loggerMiddleware } from "./middleware/logger";
+    import logger from "redux-logger";
+    import { rootReducer } from "./root-reducer";
+
+    const persistConfig = {
+      key: "root",
+      storage,
+      // Blacklist the reducers that doesn't need the local persistance
+      // Here as the userReducer is anyways persisted with firebase/firestore,
+      // we can blacklist that specific reducer
+      blacklist: ["user"],
+    };
+
+    const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+    // The shortcircuting logic helps in identifying the env type but it return only true or false,
+    // To get the actual logger object we use filter with Boolean type.
+    const middleWares = [
+      process.env.NODE_ENV !== "production" && logger,
+    ].filter(Boolean);
+
+    const composeEnhancer =
+      (process.env.NODE_ENV !== "production" &&
+        window &&
+        window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
+      compose;
+
+    const composedEnhancers = composeEnhancer(applyMiddleware(...middleWares));
+
+    export const store = createStore(
+      persistedReducer,
+      undefined,
+      composedEnhancers
+    );
+
+    export const persister = persistStore(store);
+    ```
+
+  - In `index.js`
+
+    ```javascript
+    import React from "react";
+    import ReactDOM from "react-dom/client";
+
+    import { Provider } from "react-redux";
+    import { BrowserRouter } from "react-router-dom";
+    import { store, persister } from "./store/store";
+    import { PersistGate } from "redux-persist/integration/react";
+
+    import "./index.scss";
+    import App from "./App";
+    import reportWebVitals from "./reportWebVitals";
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(
+      <React.StrictMode>
+        <Provider store={store}>
+          {/* loading={null} makes sure the app is idle until PERSIST, REHYDRATE actions are done. */}
+          <PersistGate loading={null} persistor={persister}>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </PersistGate>
+        </Provider>
+      </React.StrictMode>
+    );
+
+    // If you want to start measuring performance in your app, pass a function
+    // to log results (for example: reportWebVitals(console.log))
+    // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+    reportWebVitals();
+    ```
+
+    ```javascript
+    import { store, persister } from "./store/store";
+    import { PersistGate } from "redux-persist/integration/react";
+
+    root.render(
+      <React.StrictMode>
+        <Provider store={store}>
+          {/* loading={null} makes sure the app is idle until PERSIST, REHYDRATE actions are done. */}
+          <PersistGate loading={null} persistor={persister}>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </PersistGate>
+        </Provider>
+      </React.StrictMode>
+    );
+    ```
+
 ## Deploying the site to netlify
 
 - Use `CI= yran build` command to enable CI feature with github and netlify
