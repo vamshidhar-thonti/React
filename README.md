@@ -669,6 +669,133 @@
     );
     ```
 
+## redux-thunk
+
+`redux-thunk` supports async functionality to the flow. To get an information from an external API, we can leverage async for better performance. It acts as a middleware which takes the thunk function and further dispatches it to the relevant action type.
+
+Following are the changes needed to support `redux-thunk`:
+
+- In `store.js`, update the following content
+  ```javascript
+  import thunk from "redux-thunk";
+  const middleWares = [
+    process.env.NODE_ENV !== "production" && logger,
+    thunk,
+  ].filter(Boolean);
+  ```
+- In `category.action.js`, observe the below changes. Here 4 new functions are being created with new action types, which denote start, success and failed state, additionally the 4th function itself is the thunk supported async function, that dispatches the corresponding functions even if it is of type async.
+
+  ```javascript
+  import { CATEGORIES_ACTION_TYPES } from "./category.types";
+
+  import { getCategoriesAndDocuments } from "../../utils/firebase/firebase.utils";
+  import { createAction } from "../../utils/reducer/reducer.utils";
+
+  // When redux-thunk is not used
+  // export const setCategories = (categoriesArray) =>
+  //   createAction(CATEGORIES_ACTION_TYPES.SET_CATEGORIES, categoriesArray);
+
+  export const fetchCategoriesStart = () =>
+    createAction(CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_START);
+
+  export const fetchCategoriesSuccess = (categoriesArray) =>
+    createAction(
+      CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_SUCCESS,
+      categoriesArray
+    );
+
+  export const fetchCategoriesFailed = (error) =>
+    createAction(CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_FAILED, error);
+
+  // Thunk convention to suffix the function name with "Async"
+  export const fetchCategoriesAsync = () => async (dispatch) => {
+    dispatch(fetchCategoriesStart());
+    try {
+      const categoriesArray = await getCategoriesAndDocuments();
+      dispatch(fetchCategoriesSuccess(categoriesArray));
+    } catch (error) {
+      dispatch(fetchCategoriesFailed(error));
+    }
+  };
+  ```
+
+- In `category.reducer.js`, following code has to be updated
+  ```javascript
+  export const CATEGORIES_INITIAL_STATE = {
+    categories: [],
+    isLoading: false,
+    error: null,
+  };
+  ```
+  ```javascript
+  switch (type) {
+    case CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_START:
+      return { ...state, isLoading: true };
+    case CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_SUCCESS:
+      return { ...state, categories: payload, isLoading: false };
+    case CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_FAILED:
+      return { ...state, error: payload, isLoading: false };
+    default:
+      return state;
+  }
+  ```
+- In `category.types.js`, update the following content
+
+  ```javascript
+  export const CATEGORIES_ACTION_TYPES = {
+    FETCH_CATEGORIES_START: "category/FETCH_CATEGORIES_START",
+    FETCH_CATEGORIES_SUCCESS: "category/FETCH_CATEGORIES_SUCCESS",
+    FETCH_CATEGORIES_FAILED: "category/FETCH_CATEGORIES_FAILED",
+  };
+  ```
+
+- In `shop.component.jsx`, update the following code such that the component is now free from dealing with async related tasks and everything is handled by the async thunk code in the `action` files.
+
+  ```javascript
+  import { fetchCategoriesAsync } from "../../store/categories/category.action";
+
+  useEffect(() => {
+    dispatch(fetchCategoriesAsync());
+    // When redux-thunk is not used
+    // const getCategoriesMap = async () => {
+    //   const categoriesArray = await getCategoriesAndDocuments();
+    //   dispatch(setCategories(categoriesArray));
+    // };
+    // getCategoriesMap();
+  }, []);
+  ```
+
+## redux-saga
+
+`redux-saga` is similar to the `redux-thunk` but sagas can handle much complex async flows. In the flow, when the actions are dispatched, those will hit the middleware and then hit the reducers first before the sagas, then the action hits the saga which further connected with the middleware again. Here a saga can dispatch a new action and a saga can call another saga. Refer video 174 for more details.
+
+- Need to create a new file named `root-saga.js`
+
+  ```javascript
+  import { all, call } from "redux-saga";
+
+  // Yet to be updated
+  export function* rootSaga() {}
+  ```
+
+- Following updates are needed in order to instantiate `redux-saga`
+
+  ```javascript
+  // we should either user saga or thunk but not both
+  import createSagaMiddleware from "redux-saga";
+
+  import { rootSaga } from "./root-saga";
+
+  const sagaMiddleware = createSagaMiddleware();
+
+  const middleWares = [
+    process.env.NODE_ENV !== "production" && logger,
+    sagaMiddleware,
+  ].filter(Boolean);
+
+  sagaMiddleware.run(rootSaga);
+  ```
+
 ## Deploying the site to netlify
 
 - Use `CI= yran build` command to enable CI feature with github and netlify

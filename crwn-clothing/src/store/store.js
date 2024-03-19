@@ -4,6 +4,11 @@ import storage from "redux-persist/lib/storage";
 
 // import { loggerMiddleware } from "./middleware/logger";
 import logger from "redux-logger";
+// import { thunk } from "redux-thunk";
+import createSagaMiddleware from "redux-saga";
+
+import { rootSaga } from "./root-saga";
+
 import { rootReducer } from "./root-reducer";
 
 const persistConfig = {
@@ -12,16 +17,19 @@ const persistConfig = {
   // Blacklist the reducers that doesn't need the local persistance
   // Here as the userReducer is anyways persisted with firebase/firestore,
   // we can blacklist that specific reducer
-  blacklist: ["user"],
+  whitelist: ["cart"],
 };
+
+const sagaMiddleware = createSagaMiddleware();
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 // The shortcircuting logic helps in identifying the env type but it return only true or false,
 // To get the actual logger object we use filter with Boolean type.
-const middleWares = [process.env.NODE_ENV !== "production" && logger].filter(
-  Boolean
-);
+const middleWares = [
+  process.env.NODE_ENV !== "production" && logger,
+  sagaMiddleware,
+].filter(Boolean);
 
 const composeEnhancer =
   (process.env.NODE_ENV !== "production" &&
@@ -36,5 +44,7 @@ export const store = createStore(
   undefined,
   composedEnhancers
 );
+
+sagaMiddleware.run(rootSaga);
 
 export const persister = persistStore(store);
