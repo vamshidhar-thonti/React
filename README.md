@@ -769,19 +769,29 @@ Following are the changes needed to support `redux-thunk`:
 
 `redux-saga` is similar to the `redux-thunk` but sagas can handle much complex async flows. In the flow, when the actions are dispatched, those will hit the middleware and then hit the reducers first before the sagas, then the action hits the saga which further connected with the middleware again. Here a saga can dispatch a new action and a saga can call another saga. Refer video 174 for more details.
 
+- Few most used methods from `redux-saga` package are `takeLatest`, `all`, `call`, `put`.
+
+  - `all` - It takes list as an argument, any methods passed as items in the list within call method (like `[call(someFunction), call(someFunction2)]`) will be listened and finishes only if all the functions within the list all completed.
+  - `call` - In sagas flow, to invoke/call any method, we use `call()` method. We pass the function definition (can be normal function, generator function or async function) as first argument, any parameters that has to be passed to the function definition will passed as arguments following the first argument.
+  - `put` - It acts as a dispatch method in Sagas.
+  - `takeLatest` - It takes 2 arguments, the action that it has to monitor goes in first argument and the method goes in the second argument.
+
 - Need to create a new file named `root-saga.js`
 
   ```javascript
-  import { all, call } from "redux-saga";
+  import { all, call } from "redux-saga/effects";
+  import { categoriesSaga } from "./categories/category.saga";
 
-  // Yet to be updated
-  export function* rootSaga() {}
+  // when the webpage gets loaded initially this function gets executed from the store and further initiates the functions metioned in the all's list.
+  export function* rootSaga() {
+    yield all([call(categoriesSaga)]);
+  }
   ```
 
 - Following updates are needed in order to instantiate `redux-saga`
 
   ```javascript
-  // we should either user saga or thunk but not both
+  // we should either use saga or thunk but not both
   import createSagaMiddleware from "redux-saga";
 
   import { rootSaga } from "./root-saga";
@@ -794,6 +804,70 @@ Following are the changes needed to support `redux-thunk`:
   ].filter(Boolean);
 
   sagaMiddleware.run(rootSaga);
+  ```
+
+- A saga file `category.saga.js` has to be created as below
+
+  ```javascript
+  import { takeLatest, all, call, put } from "redux-saga/effects";
+
+  import { getCategoriesAndDocuments } from "../../utils/firebase/firebase.utils";
+
+  import {
+    fetchCategoriesSuccess,
+    fetchCategoriesFailed,
+  } from "./category.action";
+
+  import { CATEGORIES_ACTION_TYPES } from "./category.types";
+
+  // Generator function which handles the main async calls and in turn dispatches the relevant actions based on the result
+  export function* fetchCategoriesAsync() {
+    try {
+      const categoriesArray = yield call(
+        getCategoriesAndDocuments,
+        "categories"
+      );
+      yield put(fetchCategoriesSuccess(categoriesArray));
+    } catch (error) {
+      yield put(fetchCategoriesFailed(error));
+    }
+  }
+
+  // Generator function that keeps checking for the action type mentioned within the takeLatest method and if multiple same action types are found, the latest will be considered. Only after identifying the action type, the function definition will be executed.
+  export function* onFetchCategories() {
+    yield takeLatest(
+      CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_START,
+      fetchCategoriesAsync
+    );
+  }
+
+  // This method will be initiated from the root-saga file. Only after all the methods mentioned in the all's list, the next line will be executed.
+  export function* categoriesSaga() {
+    yield all([call(onFetchCategories)]);
+  }
+  ```
+
+  - Now as the `takeLatest` method is listening for start action to fetch and updated the categories, the component where the categories list is needed has to dispatch the start action.
+
+## Generators in JS
+
+- The generator functions add the extra ability to pause and resume the flow within its function using the `yield` keyword and the `next()` methods. The function returns only one yield statement at a time when next() method is called on a generator function. Mind the `*` after the function definition => `function* funcName() {}`.
+- Example
+
+  ```javascript
+  function* gen(args) {
+    yield agrs * 10;
+    yield args * 20;
+    return 100;
+  }
+
+  const g = gen(5); // A generator object will be returned upon calling the gen function
+
+  g.next(); // 5 * 10 => {value: 50, done: false} will returned and the execution gets paused until next() is called
+  g.next(); // 5 * 20 => {value: 100, done: false}, as the return statement is still pending, done is still false
+  g.next(); // {value: 100, done: true}, as there is nothing else to execute within the function, done is true
+
+  // If a return isn't specified, by deafult JS return undefined. So, the ouput would be {value: undefined, done: true}
   ```
 
 ## Deploying the site to netlify
