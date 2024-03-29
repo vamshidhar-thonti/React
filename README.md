@@ -870,6 +870,64 @@ Following are the changes needed to support `redux-thunk`:
   // If a return isn't specified, by deafult JS return undefined. So, the ouput would be {value: undefined, done: true}
   ```
 
+## redux-toolkit
+
+- Using redux-thunk or saga introduces a lot of boiler plate code to our application, to avoid that a new package has been introduced by redux team called `redux-toolkit` which simplifies the usage of redux entirely with less boiler plate code. Just to remember that there will not be any code flow changes with toolkit, the code implementation part has been made easy with the redux-toolkit package.
+- To initialize the `redux-toolkit`
+
+  ```javascript
+  import { configureStore } from "@reduxjs/toolkit";
+  import { rootReducer } from "./root-reducer"; // Root reducer created by us
+
+  export const store = configureStore({
+    reducer: rootReducer,
+    // middleware: middleWares // When mentioned, overrides the default middlewares from redux toolkit
+  });
+  ```
+
+- In `reducer.js` file, instead of creating the reducer and manually setting the action types along with the logic, toolkit provides `createSlice()` method that gives all the required feasible options.
+
+  ```javascript
+  import { createSlice } from "@reduxjs/toolkit";
+
+  const INITIAL_STATE = {
+    currentUser: null,
+  };
+
+  export const userSlice = createSlice({
+    name: "user", // The name space, refers to user in 'user/SET_CURRENT_USER' action type.
+    initialState: INITIAL_STATE, // Initial state of the user reducer
+    reducers: {
+      setCurrentUser(state, action) {
+        // The function name will be considered as the action function
+        state.currentUser = action.payload; // We know that react doesn't support mutability. Though itseems like we are mutating the data, redux-toolkit under the hood uses IMMER package which updates the state and creates a new object out of it serving the main purpose.
+      },
+    },
+  });
+
+  export const { setCurrentUser } = userSlice.actions; // Returns the action function when `actions` is called upon destructuring it.
+
+  export const userReducer = userSlice.reducer; // Returns the actual reducer of this store when reducer is called on the slice.
+  ```
+
+- By default `redux-toolkit` is designed to not allow serialisable data for which a default middleware is present called `serialisableCheck` that throws error when object type of data is passed. To workaround it we can disbale it with the below code and custom middlewares can also be added along with the default middlewares.
+  ```javascript
+  export const store = configureStore({
+    reducer: rootReducer,
+    // When mentioned overrides the default middlewares from redux toolkit
+    // getDefaultMiddleware method is given by the toolkit on middleware key
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: false, // Making the serializableCheck to false which true by default that accepts only non-serializable data like string, int etc but not class' constructor objects like UserImpl from firebase.
+      }).concat(middleWares), // Adding out custom middlewares to the default middlewares list.
+  });
+  ```
+- So 2 solutions to avoid the `non-serialisable` data passed error are
+  1. Create a custom middleware or disable the `serialisableCheck`
+  2. Convert the class object into non-serialisable supported data and pass it.
+
+- 3 default middlewares available with redux-toolkit are `redux-thunk`, `serialisableCheck`, `immutable`
+
 ## Deploying the site to netlify
 
 - Use `CI= yran build` command to enable CI feature with github and netlify
