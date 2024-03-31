@@ -51,7 +51,7 @@ const SignInForm = () => {
   };
 
   const signInWithGoogle = async () => {
-    dispatch(googleSignInStart);
+    dispatch(googleSignInStart());
   };
 
   return (
