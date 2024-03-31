@@ -4,7 +4,9 @@ import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import { store, persister } from "./store/store";
+import { Elements } from "@stripe/react-stripe-js";
 import { PersistGate } from "redux-persist/integration/react";
+import { stripePromise } from "./utils/stripe/stripe.utils";
 
 import "./index.scss";
 import App from "./App";
@@ -17,7 +19,9 @@ root.render(
       {/* loading={null} makes sure the app is idle until PERSIST, REHYDRATE actions are done. */}
       <PersistGate loading={null} persistor={persister}>
         <BrowserRouter>
-          <App />
+          <Elements stripe={stripePromise}> {/* To make app link with our stripe account add the stripe attribute to the Elements */}
+            <App />
+          </Elements>
         </BrowserRouter>
       </PersistGate>
     </Provider>

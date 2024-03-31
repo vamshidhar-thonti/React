@@ -923,10 +923,17 @@ Following are the changes needed to support `redux-thunk`:
   });
   ```
 - So 2 solutions to avoid the `non-serialisable` data passed error are
+
   1. Create a custom middleware or disable the `serialisableCheck`
   2. Convert the class object into non-serialisable supported data and pass it.
 
 - 3 default middlewares available with redux-toolkit are `redux-thunk`, `serialisableCheck`, `immutable`
+
+## Environment variables in react
+
+- By default the react app (when created using `create-app`) has the feature of reading env variables from the `.env` file.
+- Convention to write an env variable is to prepend the variable with `REACT_APP_`. For example, to create an env variable with name `SECRET_KEY`, for react to actually detect it it should be written in the `.env` file as `REACT_APP_SECRET_KEY`.
+- To actually read an env variable from the file, use the command as follows `process.env.REACT_APP_SECRET_KEY`.
 
 ## Deploying the site to netlify
 
