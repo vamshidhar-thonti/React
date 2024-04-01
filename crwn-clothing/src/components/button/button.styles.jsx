@@ -60,7 +60,7 @@ export const DisabledButton = styled(BaseButton)`
     background-color: #dee2e6;
     color: #868e96;
     border: 1px solid #868e96;
-    cursor: progress;
+    cursor: not-allowed;
   }
 `;
 

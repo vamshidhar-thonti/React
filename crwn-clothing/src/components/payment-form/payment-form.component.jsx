@@ -1,23 +1,32 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 import { selectCartTotal } from "../../store/cart/cart.selector";
 import { selectCurrentUser } from "../../store/user/user.selector";
+import { setIsPaymentPopupOpen } from "../../store/payment/payment.action";
 
 import { BUTTON_TYPE_CLASSES } from "../button/button.component";
 import {
+  PaymentOverlayContainer,
   PaymentFormContainer,
   FormContainer,
   PaymentButton,
+  ClosePopUp,
 } from "./payment-form.styles";
 
 const PaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
+  const dispatch = useDispatch();
   const amount = useSelector(selectCartTotal);
   const currentUser = useSelector(selectCurrentUser);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
+  const closePaymentPopupHandler = (event) => {
+    event.preventDefault();
+    dispatch(setIsPaymentPopupOpen(false));
+  };
 
   const paymentHandler = async (event) => {
     event.preventDefault();
@@ -51,6 +60,7 @@ const PaymentForm = () => {
     });
 
     setIsProcessingPayment(false);
+    dispatch(setIsPaymentPopupOpen(false));
 
     if (paymentResult.error) {
       alert(paymentHandler.error);
@@ -62,18 +72,21 @@ const PaymentForm = () => {
   };
 
   return (
-    <PaymentFormContainer>
-      <FormContainer onSubmit={paymentHandler}>
-        <h2>Credit Card Payment: </h2>
-        <CardElement />
-        <PaymentButton
-          isLoading={isProcessingPayment}
-          buttonType={BUTTON_TYPE_CLASSES.inverted}
-        >
-          Pay Now
-        </PaymentButton>
-      </FormContainer>
-    </PaymentFormContainer>
+    <PaymentOverlayContainer>
+      <PaymentFormContainer>
+        <ClosePopUp onClick={closePaymentPopupHandler}>&#10005;</ClosePopUp>
+        <FormContainer onSubmit={paymentHandler}>
+          <h2>Credit Card Payment: </h2>
+          <CardElement />
+          <PaymentButton
+            isLoading={isProcessingPayment}
+            buttonType={BUTTON_TYPE_CLASSES.inverted}
+          >
+            Pay Now
+          </PaymentButton>
+        </FormContainer>
+      </PaymentFormContainer>
+    </PaymentOverlayContainer>
   );
 };
 
