@@ -1,6 +1,13 @@
 import "./card.styles.css";
 
-const Card = (props) => {
+type CardProps = {
+  alt: string;
+  image: string;
+  heading: string;
+  text: string;
+};
+
+const Card = (props: CardProps) => {
   const { alt, image, heading, text } = props;
   return (
     <div className="card-container">

@@ -935,6 +935,95 @@ Following are the changes needed to support `redux-thunk`:
 - Convention to write an env variable is to prepend the variable with `REACT_APP_`. For example, to create an env variable with name `SECRET_KEY`, for react to actually detect it it should be written in the `.env` file as `REACT_APP_SECRET_KEY`.
 - To actually read an env variable from the file, use the command as follows `process.env.REACT_APP_SECRET_KEY`.
 
+## Typescript
+
+- To make the code more consistent from type errors and make it predictable and readable static typing is prefered over js default dynamic typing.
+- While defining the variables, we explicitly mention the type of the variable or the function parameters that we are going to define.
+  ```typescript
+  const myString: string = "Test String";
+  const isString: boolean = true;
+  const func: (a: string, b: boolean) => void = (a, b) => {};
+  const func: (a: string, b: string) => string = (a, b) => {
+    return a + b;
+  };
+  ```
+- `interface` is new keyword which helps in creating a standard, expected structure to an object. Convetion to create an interface variable is prepending it with `I` like `IVariableName`.
+
+  ```typescript
+  interface ISearchBoxProps {
+    onChangeHandler: (a: string) => void;
+  }
+
+  interface ISearchBox extends ISearchBoxProps {
+    className: string;
+    placeholder?: string; // If its optional
+  }
+
+  const SearchBox = ({
+    className,
+    placeholder,
+    onChangeHandler,
+  }: ISearchBox) => {
+    return (
+      <input
+        className={`search-box ${className}`}
+        type="search"
+        placeholder={placeholder}
+        onChange={(e) => onChangeHandler(e)}
+      />
+    );
+  };
+  ```
+
+  1. Interfaces can be extended from an another interface (similar to inheritance in OOP)
+  2. Interfaces can be overloaded, where we can re write the same variable name with additional parameters somewhere after the initial piece of code.
+
+- `type`s are very similar to interfaces which goes well with functional programming style. All the type definitions with `type` are similar to the intefaces only advantage is that `types` can be `unioned` which means we can define a new type that can be combined with one or many with `|` symbol. When actually defining variabled typed with a unioned type it can hold any of the values from the unioned types.
+
+  ```typescript
+  type SearchBoxProps = {
+    className: string;
+    placeholder?: string; // ?: implies optional
+    onChangeHandler: (a: string) => void;
+  };
+  ```
+
+  - Additionally, we have third party types (like react) which gives more types for event handlers etc.
+
+    ```typescript
+    import { ChangeEvent, ChangeEventHandler } from "react";
+
+    type SearchBoxProps = {
+      className: string;
+      placeholder?: string; // ?: implies optional
+      onChangeHandler: ChangeEventHandler<HTMLInputElement>; // Need to mention the specific HTML Element type
+      onChangeHandler: (event: ChangeEvent<HTMLInputElement>) => void; // Need to mention the specific HTML Element type, using ChangeEvent gives more control over the function definition and return type.
+    };
+    ```
+
+  - When a function/async call's return type is unexpected, `generics` can be used where in the definition we mention a dummy variable in angular brackets like `<T>` and when actually calling the function we pass the return type. Example scenario is with the `fetch` calls.
+
+    ```typescript
+    // Defining generic
+    export const getData = async <T>(url: string): Promise<T> => {
+      const response = await fetch(url);
+      return await response.json();
+    };
+
+    // Invoking the function with actual generic return type
+    const fetchUsers = async () => {
+      const users = await getData<Monster[]>(
+        "https://jsonplaceholder.typicode.com/users"
+      );
+    };
+    ```
+
+  - The `useState` hook if passed any generic default value like Array which can hold any data types within, then typescript by default sets it to `never` data type which is opposite to the `any` data type for safety measures. So while using `useState` hook we have to specifically mention the data type.
+
+    ```typescript
+    const [monsters, setMonsters] = useState<Monster[]>([]);
+    ```
+
 ## Deploying the site to netlify
 
 - Use `CI= yran build` command to enable CI feature with github and netlify
