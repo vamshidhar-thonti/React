@@ -1023,6 +1023,8 @@ Following are the changes needed to support `redux-thunk`:
     ```typescript
     const [monsters, setMonsters] = useState<Monster[]>([]);
     ```
+  
+  ##### ** _For any typescript related information refer udemy videos section and the actual code_
 
 ## Deploying the site to netlify
 
