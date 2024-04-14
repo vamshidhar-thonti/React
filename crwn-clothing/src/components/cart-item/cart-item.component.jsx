@@ -1,4 +1,4 @@
-import "./cart-item.styles.jsx";
+import "./cart-item.styles";
 
 import {
   CartItemContainer,
@@ -6,7 +6,7 @@ import {
   ItemDetails,
   Name,
   Price,
-} from "./cart-item.styles.jsx";
+} from "./cart-item.styles";
 
 const CartItem = ({ cartItem }) => {
   const { name, quantity, imageUrl, price } = cartItem;
