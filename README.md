@@ -1075,6 +1075,15 @@ Following are the changes needed to support `redux-thunk`:
 
   - To modify the content on the GraphQL backend, useMutation hooks can leveraged. For more information refer the documentation. [GraphQL mutations documentation](https://www.apollographql.com/docs/react/data/mutations/)
 
+## Performance optimizations
+
+- Do not optimize the code before hand unless it is necessary, optimizing the code comes with trade-offs like more CPU usage, memory etc.
+- `useCallback()` hook can be used to memoize the function but not the function's output, this helps in avoiding re-initialisation of the function definition. Just like `useEffect()` hook useCallback also takes a second parameter which is list that look for the variables that could possibily change in the future at which the function in the useCallback should re-initialise.
+- `useMemo()` hook helps in memoizing the return value of a function.
+- `memo` method from react helps in memoizing the functional component and does not re-render the entire component again and again. To use just wrap around the functional component with memo method.
+- `Code Splitting` is a way to download and render only the page that user needed and not the entire application's bundle.js while loading the site for the first time. To use this react gives 2 methods `lazy` & `Suspense`.
+  ##### \*\* _Refer video 243 for detailed explanation to implement it_
+
 ## Deploying the site to netlify
 
 - Use `CI= yran build` command to enable CI feature with github and netlify
