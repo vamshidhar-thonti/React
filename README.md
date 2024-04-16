@@ -1023,8 +1023,57 @@ Following are the changes needed to support `redux-thunk`:
     ```typescript
     const [monsters, setMonsters] = useState<Monster[]>([]);
     ```
-  
-  ##### ** _For any typescript related information refer udemy videos section and the actual code_
+
+  ##### \*\* _For any typescript related information refer udemy videos section and the actual code_
+
+## GraphQL
+
+- Helpful to query API in a much easy way with dynamic custom data selection on the result. But the backend has to be GraphQL based APIs.
+- Apollo client is the library which gives the graphql capabilites.
+- Following is the code to initialise an apollo client
+
+  - Initialize the apollo/client
+
+    ```javascript
+    import {
+      ApolloClient,
+      InMemoryCache,
+      ApolloProvider,
+    } from "@apollo/client";
+
+    const client = new ApolloClient({
+      uri: "https://crwn-clothing.com/", // GraphQL server's URI
+      cache: new InMemoryCache(),
+    });
+
+    // In index.js, wrap the below tag around <BrowserRouter>
+    <ApolloProvider client={client}></ApolloProvider>;
+    ```
+
+  - Query an API
+
+    ```javascript
+    import { gql, useQuery } from "@apollo/client";
+
+    const COLLECTIONS = gql`
+      query {
+        collections {
+          id
+          title
+          items {
+            id
+            name
+            price
+            imageUrl
+          }
+        }
+      }
+    `;
+
+    const { loading, error, data } = useQuery(COLLECTIONS);
+    ```
+
+  - To modify the content on the GraphQL backend, useMutation hooks can leveraged. For more information refer the documentation. [GraphQL mutations documentation](https://www.apollographql.com/docs/react/data/mutations/)
 
 ## Deploying the site to netlify
 
