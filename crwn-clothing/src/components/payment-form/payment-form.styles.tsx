@@ -27,16 +27,32 @@ export const PaymentFormContainer = styled.div`
   border-radius: 5px;
   padding-bottom: 40px;
   z-index: 2;
+
+  @media screen and (max-width: 800px) {
+    width: 80%;
+    height: 200px;
+  }
 `;
 
 export const FormContainer = styled.form`
   height: 100px;
   min-width: 500px;
+
+  @media screen and (max-width: 800px) {
+    min-width: 85%;
+  }
 `;
 
 export const PaymentButton = styled(Button)`
   margin-left: auto;
   margin-top: 30px;
+
+  @media screen and (max-width: 800px) {
+    margin-top: 24px;
+    font-size: 12px;
+    min-width: 100px;
+    padding: 4px 12px;
+  }
 `;
 
 export const ClosePopUp = styled.div`
@@ -46,4 +62,10 @@ export const ClosePopUp = styled.div`
   font-size: 20px;
   cursor: pointer;
   z-index: 2;
+
+  @media screen and (max-width: 800px) {
+    font-size: 16px;
+    top: 12px;
+    right: 12px;
+  }
 `;

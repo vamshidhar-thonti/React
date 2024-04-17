@@ -22,4 +22,10 @@ export const GlobalStyle = createGlobalStyle`
     text-decoration: none;
     color: black;
   }
+
+  @media screen and (max-width: 800px) {
+    body {
+      padding: 10px 16px;
+    }
+  }
 `;

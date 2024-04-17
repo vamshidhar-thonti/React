@@ -8,6 +8,10 @@ export const CheckoutItemContainer = styled.div`
   padding: 15px 0;
   font-size: 18px;
   align-items: center;
+
+  @media screen and (max-width: 800px) {
+    font-size: 12px;
+  }
 `;
 
 export const ImageContainer = styled.div`
@@ -43,9 +47,17 @@ export const Arrow = styled.div`
 
 export const Value = styled.span`
   margin: 0 10px;
+
+  @media screen and (max-width: 800px) {
+    margin: 0px 4px;
+  }
 `;
 
 export const RemoveButton = styled.div`
   padding-left: 12px;
   cursor: pointer;
+
+  @media screen and (max-width: 800px) {
+    padding-left: 0px;
+  }
 `;
