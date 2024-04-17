@@ -8,9 +8,10 @@ import { Elements } from "@stripe/react-stripe-js";
 import { PersistGate } from "redux-persist/integration/react";
 import { stripePromise } from "./utils/stripe/stripe.utils";
 
-import "./index.scss";
+// import "./index.scss";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -19,7 +20,9 @@ root.render(
       {/* loading={null} makes sure the app is idle until PERSIST, REHYDRATE actions are done. */}
       <PersistGate loading={null} persistor={persister}>
         <BrowserRouter>
-          <Elements stripe={stripePromise}> {/* To make app link with our stripe account add the stripe attribute to the Elements */}
+          <Elements stripe={stripePromise}>
+            {" "}
+            {/* To make app link with our stripe account add the stripe attribute to the Elements */}
             <App />
           </Elements>
         </BrowserRouter>
@@ -27,6 +30,8 @@ root.render(
     </Provider>
   </React.StrictMode>
 );
+
+serviceWorkerRegistration.register();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
